@@ -1,14 +1,23 @@
 const connectButton = document.getElementById('connectButton');
 const disconnectButton = document.getElementById('disconnectButton');
 const walletAddressDisplay = document.getElementById('walletAddress');
+const iosMessage = document.getElementById('iosMessage');
+const openInPhantom = document.getElementById('openInPhantom');
+
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent.toLowerCase());
+}
+
+function isAndroid() {
+  return /android/i.test(navigator.userAgent.toLowerCase());
+}
 
 function isMobile() {
-  return /android|iphone|ipad|ipod/i.test(navigator.userAgent.toLowerCase());
+  return isIOS() || isAndroid();
 }
 
 async function connectWallet() {
   const isPhantomInstalled = window.solana && window.solana.isPhantom;
-  const mobile = isMobile();
 
   if (isPhantomInstalled) {
     try {
@@ -21,16 +30,15 @@ async function connectWallet() {
       console.error('Erro ao conectar:', err);
       walletAddressDisplay.innerText = 'Erro ao conectar à carteira.';
     }
-  } else if (mobile) {
-    // Redirecionamento para o app Phantom com pedido de conexão
+  } else if (isAndroid()) {
     const dappUrl = encodeURIComponent(window.location.href);
     const phantomDeepLink = `https://phantom.app/ul/v1/connect?app_url=${dappUrl}&redirect_link=${dappUrl}`;
-
-    // iOS precisa de replace para abrir o deep link corretamente
     window.location.replace(phantomDeepLink);
+  } else if (isIOS()) {
+    // Mostra instrução para abrir o site dentro do app Phantom
+    iosMessage.style.display = 'block';
   } else {
-    // Apenas desktop sem Phantom instalada
-    alert("Por favor, instale a carteira Phantom no seu navegador.");
+    alert("Por favor, instale a extensão Phantom no seu navegador.");
   }
 }
 
@@ -61,6 +69,13 @@ window.addEventListener('load', async () => {
     } catch (err) {
       console.log('Usuário não autorizou conexão automática.');
     }
+  }
+
+  // Prepara o botão para abrir no app da Phantom (iPhone)
+  if (isIOS()) {
+    const currentUrl = encodeURIComponent(window.location.href);
+    const phantomBrowseUrl = `https://phantom.app/ul/browse/${currentUrl}`;
+    openInPhantom.href = phantomBrowseUrl;
   }
 });
 
