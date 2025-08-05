@@ -48,7 +48,8 @@
         const appUrl = encodeURIComponent("https://daniloalmeid.github.io/testecarteira/index.html");
         const redirectLink = encodeURIComponent(`https://daniloalmeid.github.io/testecarteira/callback.html?dapp_private_key=${privateKeyBase64}`);
 
-        const phantomLink = `https://phantom.app/ul/v1/connect?app_url=${appUrl}&redirect_link=${redirectLink}&dapp_encryption_public_key=${publicKeyBase64}`;
+        const phantomLink = `https://phantom.app/ul/v1/signAndSendTransaction?app_url=${appUrl}&redirect_link=${redirectLink}&dapp_encryption_public_key=${publicKeyBase64}&payload=${encodeURIComponent(btoa('Login seguro no DetHabits'))}`;
+
         window.location.href = phantomLink;
       }
     }
