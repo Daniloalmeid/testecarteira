@@ -1,24 +1,32 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Conectar Carteira Phantom</title>
+  <meta charset="UTF-8">
+  <title>Conectar Phantom - Compatível iOS</title>
+  <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tweetnacl-util@0.15.1/nacl-util.min.js"></script>
 </head>
 <body>
-  <h1>Conectar Carteira Phantom</h1>
+  <h2>Conectar com Phantom</h2>
+  <button onclick="connectPhantom()">Conectar</button>
 
-  <button id="connectButton">Conectar Carteira</button>
-  <button id="disconnectButton" style="display:none;">Desconectar</button>
+  <script>
+    function connectPhantom() {
+      const keyPair = nacl.box.keyPair();
+      const dappPublicKey = keyPair.publicKey;
+      const dappPrivateKey = keyPair.secretKey;
 
-  <p id="walletAddress">Carteira não conectada.</p>
+      const publicKeyBase64 = nacl.util.encodeBase64(dappPublicKey);
+      const privateKeyBase64 = nacl.util.encodeBase64(dappPrivateKey);
 
-  <div id="iosMessage" style="display:none; color: red; margin-top: 20px;">
-    ⚠️ iPhone detectado: Clique abaixo para abrir no app da Phantom:<br><br>
-    <a href="#" id="openInPhantom" style="font-weight: bold; font-size: 18px; color: blue;">👉 Abrir no app da Phantom</a>
-  </div>
+      // Monta a URL com a chave privada como parâmetro temporário (codificada)
+      const appUrl = encodeURIComponent("https://SEUSITE.com/index.html");
+      const redirectLink = encodeURIComponent(`https://SEUSITE.com/callback.html?dapp_private_key=${privateKeyBase64}`);
 
-  <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.76.0/lib/index.iife.min.js"></script>
-  <script src="wallet.js"></script>
+      const phantomLink = `https://phantom.app/ul/v1/connect?app_url=${appUrl}&redirect_link=${redirectLink}&dapp_encryption_public_key=${publicKeyBase64}`;
+
+      window.location.href = phantomLink;
+    }
+  </script>
 </body>
 </html>

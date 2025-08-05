@@ -21,8 +21,13 @@
         const encryptedPayload = getParam("phantom_encrypted_payload");
         const nonce = getParam("phantom_nonce");
         const encryptionPublicKey = getParam("phantom_encryption_public_key");
+        const dappPrivateKeyBase64 = getParam("dapp_private_key");
 
-        const dappPrivateKeyBase64 = sessionStorage.getItem("dappPrivateKey");
+        if (!dappPrivateKeyBase64) {
+          document.getElementById("result").innerText = "Chave dApp ausente. Não é possível descriptografar.";
+          return;
+        }
+
         const dappPrivateKey = nacl.util.decodeBase64(dappPrivateKeyBase64);
         const phantomPublicKey = nacl.util.decodeBase64(encryptionPublicKey);
 
