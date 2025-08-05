@@ -1,15 +1,16 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Conectar Phantom</title>
+  <title>Conectar Phantom com Assinatura</title>
   <script src="https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/nacl.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tweetnacl-util@0.15.1/nacl-util.min.js"></script>
 </head>
 <body>
   <h2>Conectar com Phantom</h2>
   <button onclick="connectPhantom()">Conectar</button>
-  <p id="status">Esperando conexão...</p>
+  <p id="status">Aguardando...</p>
 
   <script>
     const status = document.getElementById("status");
@@ -20,17 +21,23 @@
 
     function connectPhantom() {
       if (window.solana && window.solana.isPhantom && !isMobile()) {
-        // DESKTOP com extensão
+        // Desktop com extensão
         window.solana.connect()
-          .then(({ publicKey }) => {
-            status.innerText = "Carteira conectada: " + publicKey.toString();
+          .then(async ({ publicKey }) => {
+            status.innerText = "Carteira: " + publicKey.toString();
+
+            const message = new TextEncoder().encode("Login seguro no DetHabits");
+            const signed = await window.solana.signMessage(message, "utf8");
+
+            const signatureBase64 = btoa(String.fromCharCode(...signed.signature));
+            status.innerText += "\nAssinatura: " + signatureBase64;
           })
           .catch(err => {
             console.error(err);
-            status.innerText = "Erro ao conectar: " + err.message;
+            status.innerText = "Erro: " + err.message;
           });
       } else {
-        // MOBILE com deep link
+        // Mobile: deep link com callback
         const keyPair = nacl.box.keyPair();
         const dappPublicKey = keyPair.publicKey;
         const dappPrivateKey = keyPair.secretKey;
@@ -42,7 +49,6 @@
         const redirectLink = encodeURIComponent(`https://daniloalmeid.github.io/testecarteira/callback.html?dapp_private_key=${privateKeyBase64}`);
 
         const phantomLink = `https://phantom.app/ul/v1/connect?app_url=${appUrl}&redirect_link=${redirectLink}&dapp_encryption_public_key=${publicKeyBase64}`;
-
         window.location.href = phantomLink;
       }
     }
