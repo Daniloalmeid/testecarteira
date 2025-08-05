@@ -20,7 +20,7 @@
 
     function connectPhantom() {
       if (window.solana && window.solana.isPhantom && !isMobile()) {
-        // 💻 DESKTOP - usar extensão
+        // DESKTOP com extensão
         window.solana.connect()
           .then(({ publicKey }) => {
             status.innerText = "Carteira conectada: " + publicKey.toString();
@@ -30,7 +30,7 @@
             status.innerText = "Erro ao conectar: " + err.message;
           });
       } else {
-        // 📱 MOBILE - usar deep link
+        // MOBILE com deep link
         const keyPair = nacl.box.keyPair();
         const dappPublicKey = keyPair.publicKey;
         const dappPrivateKey = keyPair.secretKey;
@@ -38,8 +38,8 @@
         const publicKeyBase64 = nacl.util.encodeBase64(dappPublicKey);
         const privateKeyBase64 = nacl.util.encodeBase64(dappPrivateKey);
 
-        const appUrl = encodeURIComponent("https://SEUSITE.com/index.html");
-        const redirectLink = encodeURIComponent(`https://SEUSITE.com/callback.html?dapp_private_key=${privateKeyBase64}`);
+        const appUrl = encodeURIComponent("https://daniloalmeid.github.io/testecarteira/index.html");
+        const redirectLink = encodeURIComponent(`https://daniloalmeid.github.io/testecarteira/callback.html?dapp_private_key=${privateKeyBase64}`);
 
         const phantomLink = `https://phantom.app/ul/v1/connect?app_url=${appUrl}&redirect_link=${redirectLink}&dapp_encryption_public_key=${publicKeyBase64}`;
 
