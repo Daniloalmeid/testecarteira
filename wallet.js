@@ -8,9 +8,9 @@ function isMobile() {
 
 async function connectWallet() {
   const isPhantomInstalled = window.solana && window.solana.isPhantom;
+  const mobile = isMobile();
 
   if (isPhantomInstalled) {
-    // Desktop ou navegador mobile com extensão
     try {
       const resp = await window.solana.connect();
       const walletAddress = resp.publicKey.toString();
@@ -21,13 +21,15 @@ async function connectWallet() {
       console.error('Erro ao conectar:', err);
       walletAddressDisplay.innerText = 'Erro ao conectar à carteira.';
     }
-  } else if (isMobile()) {
-    // Redireciona para o deep link da Phantom no celular
+  } else if (mobile) {
+    // Redirecionamento para o app Phantom com pedido de conexão
     const dappUrl = encodeURIComponent(window.location.href);
-    const deepLink = `https://phantom.app/ul/v1/connect?app_url=${dappUrl}&redirect_link=${dappUrl}`;
-    window.location.href = deepLink;
+    const phantomDeepLink = `https://phantom.app/ul/v1/connect?app_url=${dappUrl}&redirect_link=${dappUrl}`;
+
+    // iOS precisa de replace para abrir o deep link corretamente
+    window.location.replace(phantomDeepLink);
   } else {
-    // Apenas em desktop sem Phantom instalada
+    // Apenas desktop sem Phantom instalada
     alert("Por favor, instale a carteira Phantom no seu navegador.");
   }
 }
@@ -45,7 +47,7 @@ async function disconnectWallet() {
   }
 }
 
-// Verifica se já está conectado ao carregar
+// Verifica se já está conectada ao carregar a página
 window.addEventListener('load', async () => {
   if (window.solana && window.solana.isPhantom) {
     try {
@@ -57,7 +59,7 @@ window.addEventListener('load', async () => {
         disconnectButton.style.display = 'inline-block';
       }
     } catch (err) {
-      console.log('Usuário não deu permissão automática.');
+      console.log('Usuário não autorizou conexão automática.');
     }
   }
 });
