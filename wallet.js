@@ -3,13 +3,14 @@ const disconnectButton = document.getElementById('disconnectButton');
 const walletAddressDisplay = document.getElementById('walletAddress');
 
 function isMobile() {
-  return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+  return /android|iphone|ipad|ipod/i.test(navigator.userAgent.toLowerCase());
 }
 
 async function connectWallet() {
   const isPhantomInstalled = window.solana && window.solana.isPhantom;
 
   if (isPhantomInstalled) {
+    // Desktop ou navegador mobile com extensão
     try {
       const resp = await window.solana.connect();
       const walletAddress = resp.publicKey.toString();
@@ -21,10 +22,12 @@ async function connectWallet() {
       walletAddressDisplay.innerText = 'Erro ao conectar à carteira.';
     }
   } else if (isMobile()) {
+    // Redireciona para o deep link da Phantom no celular
     const dappUrl = encodeURIComponent(window.location.href);
     const deepLink = `https://phantom.app/ul/v1/connect?app_url=${dappUrl}&redirect_link=${dappUrl}`;
     window.location.href = deepLink;
   } else {
+    // Apenas em desktop sem Phantom instalada
     alert("Por favor, instale a carteira Phantom no seu navegador.");
   }
 }
@@ -42,7 +45,7 @@ async function disconnectWallet() {
   }
 }
 
-// Verifica se já está conectado ao carregar a página
+// Verifica se já está conectado ao carregar
 window.addEventListener('load', async () => {
   if (window.solana && window.solana.isPhantom) {
     try {
