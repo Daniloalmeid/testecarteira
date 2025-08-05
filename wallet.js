@@ -1,41 +1,23 @@
-// Função para conectar à carteira Phantom
+const connectButton = document.getElementById('connectButton');
+const walletAddressDisplay = document.getElementById('walletAddress');
+
 async function connectWallet() {
+  const isPhantomInstalled = window.solana && window.solana.isPhantom;
+
+  if (isPhantomInstalled) {
     try {
-        // Verifica se a Phantom Wallet está disponível
-        const provider = window.solana || window.phantom?.solana;
-
-        if (!provider || !provider.isPhantom) {
-            alert('Carteira Phantom não detectada. Instale a extensão ou aplicativo Phantom.');
-            return;
-        }
-
-        // Solicita conexão à carteira
-        const response = await provider.connect();
-        const publicKey = response.publicKey.toString();
-
-        // Exibe o endereço da carteira
-        document.getElementById('walletAddress').innerText = `Carteira conectada: ${publicKey}`;
-
-        // Opcional: Exemplo de interação com a blockchain Solana
-        const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'), 'confirmed');
-        const balance = await connection.getBalance(response.publicKey);
-        console.log(`Saldo da carteira: ${balance / solanaWeb3.LAMPORTS_PER_SOL} SOL`);
-
-    } catch (error) {
-        console.error('Erro ao conectar à carteira:', error);
-        alert('Erro ao conectar à carteira. Verifique se a Phantom está instalada e desbloqueada.');
+      const resp = await window.solana.connect();
+      const walletAddress = resp.publicKey.toString();
+      walletAddressDisplay.innerText = 'Carteira conectada: ' + walletAddress;
+    } catch (err) {
+      console.error('Erro ao conectar:', err);
     }
+  } else {
+    // Deep link para Phantom (mobile)
+    const currentUrl = window.location.href;
+    const phantomDeepLink = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}`;
+    window.location.href = phantomDeepLink;
+  }
 }
 
-// Verifica automaticamente se a Phantom está conectada ao carregar a página
-window.addEventListener('load', async () => {
-    const provider = window.solana || window.phantom?.solana;
-    if (provider && provider.isConnected) {
-        try {
-            const response = await provider.connect({ onlyIfTrusted: true });
-            document.getElementById('walletAddress').innerText = `Carteira conectada: ${response.publicKey.toString()}`;
-        } catch (error) {
-            console.log('Nenhuma conexão automática disponível:', error);
-        }
-    }
-});
+connectButton.addEventListener('click', connectWallet);
