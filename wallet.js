@@ -12,10 +12,6 @@ function isAndroid() {
   return /android/i.test(navigator.userAgent.toLowerCase());
 }
 
-function isMobile() {
-  return isIOS() || isAndroid();
-}
-
 async function connectWallet() {
   const isPhantomInstalled = window.solana && window.solana.isPhantom;
 
@@ -35,7 +31,6 @@ async function connectWallet() {
     const phantomDeepLink = `https://phantom.app/ul/v1/connect?app_url=${dappUrl}&redirect_link=${dappUrl}`;
     window.location.replace(phantomDeepLink);
   } else if (isIOS()) {
-    // Mostra instrução para abrir o site dentro do app Phantom
     iosMessage.style.display = 'block';
   } else {
     alert("Por favor, instale a extensão Phantom no seu navegador.");
@@ -55,7 +50,6 @@ async function disconnectWallet() {
   }
 }
 
-// Verifica se já está conectada ao carregar a página
 window.addEventListener('load', async () => {
   if (window.solana && window.solana.isPhantom) {
     try {
@@ -67,11 +61,11 @@ window.addEventListener('load', async () => {
         disconnectButton.style.display = 'inline-block';
       }
     } catch (err) {
-      console.log('Usuário não autorizou conexão automática.');
+      console.log('Conexão automática recusada.');
     }
   }
 
-  // Prepara o botão para abrir no app da Phantom (iPhone)
+  // Link especial para iOS abrir no app da Phantom
   if (isIOS()) {
     const currentUrl = encodeURIComponent(window.location.href);
     const phantomBrowseUrl = `https://phantom.app/ul/browse/${currentUrl}`;
