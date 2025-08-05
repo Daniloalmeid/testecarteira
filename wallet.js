@@ -13,11 +13,11 @@ async function connectWallet() {
       console.error('Erro ao conectar:', err);
     }
   } else {
-    // Deep link para Phantom (mobile)
-    const currentUrl = window.location.href;
-    const phantomDeepLink = `https://phantom.app/ul/browse/${encodeURIComponent(currentUrl)}`;
-    window.location.href = phantomDeepLink;
+    // Deep link de conexão com Phantom (mobile)
+    const dappUrl = encodeURIComponent(window.location.origin); // ou URL do seu site
+    const redirectLink = `https://phantom.app/ul/v1/connect?app_url=${dappUrl}&redirect_link=${dappUrl}`;
+
+    // Redireciona para o app Phantom com pedido de conexão
+    window.location.href = redirectLink;
   }
 }
-
-connectButton.addEventListener('click', connectWallet);
